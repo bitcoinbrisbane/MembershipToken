@@ -65,10 +65,10 @@ contract MembershipVerificationToken is Ownable, ERC165 {
     //     emit RequestedMembership(msg.sender);
     // }
 
-    // function forfeitMembership() external payable isCurrentHolder {
-    //     _revoke(msg.sender);
-    //     emit Forfeited(msg.sender);
-    // }
+    function forfeitMembership() external payable isCurrentHolder {
+        _revoke(msg.sender);
+        emit Forfeited(msg.sender);
+    }
 
     // function approveRequest(address _user) external onlyOwner {
     //     PendingRequest storage request = pendingRequests[_user];
@@ -96,12 +96,12 @@ contract MembershipVerificationToken is Ownable, ERC165 {
 
     function addAttributeSet(bytes32 _name, bytes32[] calldata values) external {
         attributeNames.push(_name);
-        bytes32[] storage storedValues = attributeValueCollection[attributeNames.length - 1];
-        storedValues.push(0x756e646566696e65640000000000000000000000000000000000000000000000);
+        // bytes32[] storage storedValues = attributeValueCollection[attributeNames.length - 1];
+        // storedValues.push(0x756e646566696e65640000000000000000000000000000000000000000000000);
         
-        for (uint index = 0; index < values.length; index++) {
-            storedValues.push(values[index]);
-        }
+        // for (uint index = 0; index < values.length; index++) {
+        //     storedValues.push(values[index]);
+        // }
     }
 
     // function modifyAttributeByIndex(address _to, uint _attributeIndex, uint _modifiedValueIndex) external onlyOwner {
