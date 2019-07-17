@@ -62,7 +62,8 @@ contract MembershipVerificationToken is Ownable, ERC165 {
         //Do some checks before assigning membership
         PendingRequest storage request = pendingRequests[msg.sender];
         request.isPending = true;
-        //request.attributes = _attributeIndexes;
+        request.attributeIndexes = _attributeIndexes;
+        
         emit RequestedMembership(msg.sender);
     }
 
