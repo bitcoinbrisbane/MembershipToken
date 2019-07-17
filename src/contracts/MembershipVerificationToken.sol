@@ -11,7 +11,7 @@ contract MembershipVerificationToken is Ownable, ERC165 {
 
     struct MemberData {
         bool hasToken;
-        bytes[] data;
+        uint[] data;
     }
 
     struct PendingRequest {
@@ -72,22 +72,26 @@ contract MembershipVerificationToken is Ownable, ERC165 {
         emit Forfeited(msg.sender);
     }
 
-    // function approveRequest(address _user) external onlyOwner {
-    //     PendingRequest storage request = pendingRequests[_user];
-    //     require(request.isPending, "Hasn't sent ether yet");
-    //     _assign(_user, request.attributes);
-    //     emit ApprovedMembership(_user, request.attributes);
-    // }
+    function approveRequest(address _user) external onlyOwner {
+        PendingRequest storage request = pendingRequests[_user];
+
+        require(request.isPending, "Hasn't sent ether yet");
+        _assign(_user, request.attributeIndexes);
+
+        emit ApprovedMembership(_user, request.attributeIndexes);
+    }
 
     function discardRequest(address _user) external onlyOwner {
         PendingRequest storage request = pendingRequests[_user];
+
         require(request.isPending, "Hasn't sent ether yet");
         request.isPending = false;
+
         delete request.attributeIndexes;
     }
 
     function assignTo(address _to, uint[] calldata _attributeIndexes) external onlyOwner {
-        //_assign(_to, _attributeIndexes);
+        _assign(_to, _attributeIndexes);
         emit Assigned(_to, _attributeIndexes);
     }
 
@@ -146,31 +150,32 @@ contract MembershipVerificationToken is Ownable, ERC165 {
         return attributeValueCollection[_index];
     }
 
-    // function getAttributeByIndex(address _to, uint _attributeIndex) external view returns (bytes32) {
-    //     require(currentHolders[_to].data.length > _attributeIndex,"data doesn't exist for the user");
-    //     return currentHolders[_to].data[_attributeIndex];
-    // }
-
-    function isCurrentMember(address _to) public view returns (bool) {
-        require(_to != address(0), "Zero address can't be a member");
-        return currentHolders[_to].hasToken;
+    function getAttributeByIndex(address _who, uint _attributeIndex) external view returns (uint) {
+        require(currentHolders[_who].data.length > _attributeIndex, "data doesn't exist for the user");
+        return currentHolders[_who].data[_attributeIndex];
     }
 
-    // function _assign(address _to, uint[] memory _attributeIndexes) internal {
-    //     require(_to != address(0), "Can't assign to zero address");
-    //     require(
-    //         _attributeIndexes.length == attributeNames.length,
-    //         "Need to input all attributes"
-    //     );
-    //     MemberData memory member;
-    //     member.hasToken = true;
-    //     currentHolders[_to] = member;
-    //     for (uint index = 0; index < _attributeIndexes.length; index++) {
-    //         currentHolders[_to].data.push(_attributeIndexes[index]);
-    //     }
-    //     allHolders.push(_to);
-    //     currentMemberCount += 1;
-    // }
+    function isCurrentMember(address _who) public view returns (bool) {
+        require(_who != address(0), "Zero address can't be a member");
+        return currentHolders[_who].hasToken;
+    }
+
+    function _assign(address _who, uint[] memory _attributeIndexes) internal {
+        require(_who != address(0), "Can't assign to zero address");
+        require(_attributeIndexes.length == attributeNames.length,"Need to input all attributes");
+
+        MemberData memory member;
+        member.hasToken = true;
+        currentHolders[_who] = member;
+
+        for (uint index = 0; index < _attributeIndexes.length; index++) {
+
+            currentHolders[_who].data.push(_attributeIndexes[index]);
+        }
+
+        allHolders.push(_who);
+        currentMemberCount += 1;
+    }
 
     function _revoke(address _from) internal {
         require(_from != address(0), "Can't revoke from zero address");

@@ -26,12 +26,12 @@ contract("MembershipVerificationToken", function(accounts) {
     });
 
     it("should apply for life member", async function () {
-      await contractInstance.requestMembership([0]);
+      await contractInstance.requestMembership([0], {from: ALICE});
 
       var isMember = await contractInstance.isCurrentMember(OWNER);
       assert.isFalse(isMember);
       
-      // const actual = await tokenInstance._inventory(0);
+      await tokenInstance.approveRequest(OWNER);
       // assert.equal(Number(actual[0]), 100, "Stock not correct");
     });
   });
