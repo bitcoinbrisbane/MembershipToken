@@ -16,7 +16,8 @@ contract MembershipVerificationToken is Ownable, ERC165 {
 
     struct PendingRequest {
         bool isPending;
-        bytes32[] attributes;
+        //bytes32[] attributes;
+        uint[] attributeIndexes;
     }
 
     mapping(uint => bytes32[]) public attributeValueCollection;
@@ -54,16 +55,16 @@ contract MembershipVerificationToken is Ownable, ERC165 {
         _;
     }
 
-    // function requestMembership(uint[] _attributeIndexes) external payable {
-    //     require(!isCurrentMember(msg.sender), "Already a member");
-    //     require(_attributeIndexes.length == attributeNames.length, "Need to input all attributes");
+    function requestMembership(uint[] calldata _attributeIndexes) external payable {
+        require(!isCurrentMember(msg.sender), "Already a member");
+        require(_attributeIndexes.length == attributeNames.length, "Need to input all attributes");
 
-    //     //Do some checks before assigning membership
-    //     PendingRequest storage request = pendingRequests[msg.sender];
-    //     request.isPending = true;
-    //     request.attributes = _attributeIndexes;
-    //     emit RequestedMembership(msg.sender);
-    // }
+        //Do some checks before assigning membership
+        PendingRequest storage request = pendingRequests[msg.sender];
+        request.isPending = true;
+        //request.attributes = _attributeIndexes;
+        emit RequestedMembership(msg.sender);
+    }
 
     function forfeitMembership() external payable isCurrentHolder {
         _revoke(msg.sender);
@@ -81,7 +82,7 @@ contract MembershipVerificationToken is Ownable, ERC165 {
         PendingRequest storage request = pendingRequests[_user];
         require(request.isPending, "Hasn't sent ether yet");
         request.isPending = false;
-        delete request.attributes;
+        delete request.attributeIndexes;
     }
 
     function assignTo(address _to, uint[] calldata _attributeIndexes) external onlyOwner {
@@ -98,7 +99,7 @@ contract MembershipVerificationToken is Ownable, ERC165 {
         attributeNames.push(_name);
         bytes32[] storage storedValues = attributeValueCollection[attributeNames.length - 1];
         storedValues.push(0x756e646566696e65640000000000000000000000000000000000000000000000);
-        
+
         for (uint index = 0; index < values.length; index++) {
             storedValues.push(values[index]);
         }

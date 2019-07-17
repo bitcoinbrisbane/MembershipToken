@@ -1,6 +1,6 @@
 module.exports = {
 
-    plugins: ["truffle-security"],
+    //plugins: ["truffle-security"],
   
     networks: {
       development: {
