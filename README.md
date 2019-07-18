@@ -6,3 +6,6 @@ Blockchain Australia membership ERC1621
 ## Contract Address
 
 ## ENS
+```
+members.blockchainaustralia.ens
+```
