@@ -141,10 +141,10 @@ contract MembershipVerificationToken is Ownable, ERC165 {
         return attributeNames;
     }
 
-    // function getAttributes(address _to) external view returns (bytes32[] memory) {
-    //     require(_to != address(0), "Address cannot be zero");
-    //     return currentHolders[_to].data;
-    // }
+    function getAttributes(address _to) external view returns (uint[] memory) {
+        require(_to != address(0), "Address cannot be zero");
+        return currentHolders[_to].data;
+    }
 
     function getAttributeExhaustiveCollection(uint _index) external view returns (bytes32[] memory) {
         return attributeValueCollection[_index];

@@ -14,9 +14,6 @@ contract("MembershipVerificationToken", function(accounts) {
   describe("MembershipVerificationToken tests", () => {
     it("should add member level attibute set", async function () {
       await contractInstance.addAttributeSet("0x4c6576656c", ["0x4c696665"]);
-
-      // const actual = await tokenInstance._inventory(0);
-      // assert.equal(Number(actual[0]), 100, "Stock not correct");
     });
   });
 
@@ -26,13 +23,14 @@ contract("MembershipVerificationToken", function(accounts) {
     });
 
     it("should apply for life member", async function () {
-      await contractInstance.requestMembership([0], {from: ALICE});
+      await contractInstance.requestMembership([0], {value: 1000, from: ALICE});
 
-      var isMember = await contractInstance.isCurrentMember(OWNER);
+      var isMember = await contractInstance.isCurrentMember(ALICE);
       assert.isFalse(isMember);
       
-      await tokenInstance.approveRequest(OWNER);
-      // assert.equal(Number(actual[0]), 100, "Stock not correct");
+      await contractInstance.approveRequest(ALICE);
+      isMember = await contractInstance.isCurrentMember(ALICE);
+      assert.isTrue(isMember);
     });
   });
 });
