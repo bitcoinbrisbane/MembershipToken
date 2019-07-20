@@ -1,5 +1,5 @@
 # Membership Token
-Blockchain Australia membership ERC1621
+Blockchain Australia Membership Verification Token (MVT) ERC1261
 
 ## How to use
 
@@ -7,11 +7,15 @@ Blockchain Australia membership ERC1621
 
 * Rinkeby `0x814970e830ff4abf1d03c22a72eeaab910abbdc5`
 
-## ENS
-```
-members.blockchainaustralia.ens
-```
+## Attributes
 
+### Levels
+
+| Index | Type | Hex |
+|---|---|---|---|
+| 0 | life | 0x6c696665 |
+
+## Tests
 ### Test keys
 `tragic near rocket across biology shop push dragon jazz detail differ say`
 
