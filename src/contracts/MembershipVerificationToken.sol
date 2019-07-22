@@ -19,6 +19,13 @@ contract MembershipVerificationToken is Ownable, ERC165 {
         uint[] attributeIndexes;
     }
 
+    struct MembershipType {
+        uint256 fee;
+        uint256 duration;
+    }
+
+    mapping (bytes32 => MembershipType) public membershipType;
+
     mapping(uint => bytes32[]) public attributeValueCollection;
     bytes32[] public attributeNames;
 
@@ -26,7 +33,6 @@ contract MembershipVerificationToken is Ownable, ERC165 {
     mapping(address => PendingRequest) public pendingRequests;
 
     address[] public allHolders;
-
     uint public currentMemberCount;
 
     event ApprovedMembership(address indexed _to, uint[] attributeIndexes);
@@ -47,6 +53,8 @@ contract MembershipVerificationToken is Ownable, ERC165 {
     constructor() public {
         _registerInterface(0x912f7bb2); //IERC1261
         _registerInterface(0x83adfb2d); //Ownable
+
+        
     }
 
     modifier isCurrentHolder {
@@ -57,6 +65,8 @@ contract MembershipVerificationToken is Ownable, ERC165 {
     function requestMembership(uint[] calldata _attributeIndexes) external payable {
         require(!isCurrentMember(msg.sender), "Already a member");
         require(_attributeIndexes.length == attributeNames.length, "Need to input all attributes");
+
+
 
         //Do some checks before assigning membership
         PendingRequest storage request = pendingRequests[msg.sender];
@@ -77,9 +87,13 @@ contract MembershipVerificationToken is Ownable, ERC165 {
         PendingRequest storage request = pendingRequests[_user];
 
         require(request.isPending, "Hasn't sent ether yet");
-        _assign(_user, request.attributeIndexes);
 
-        //member.from = _from;
+        //
+        for (uint256 i = 0; i < request.attributeIndexes.length; i++) {
+            currentHolders[_user].data[i] = request.attributeIndexes[i];
+        }
+
+        currentHolders[_user].from = now;
         //member.to = _to;
 
         allHolders.push(_user);
@@ -178,5 +192,9 @@ contract MembershipVerificationToken is Ownable, ERC165 {
         MemberData storage member = currentHolders[_from];
         member.to = now;
         currentMemberCount -= 1;
+    }
+
+    function _getEndDate(bytes32 _level) internal returns (uint256) {
+        return now + 1 years;
     }
 }
