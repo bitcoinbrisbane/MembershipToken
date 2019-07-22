@@ -6,17 +6,16 @@ import "./Interfaces.sol";
 
 contract MembershipVerificationToken is Ownable, ERC165 {
 
-    uint256 public fee;
     string public name = "Blockchain Australia";
 
     struct MemberData {
-        bool hasToken;
+        uint from;
+        uint to;
         uint[] data;
     }
 
     struct PendingRequest {
         bool isPending;
-        //bytes32[] attributes;
         uint[] attributeIndexes;
     }
 
@@ -73,18 +72,24 @@ contract MembershipVerificationToken is Ownable, ERC165 {
     }
 
     function approveRequest(address _user) external onlyOwner {
+        require(!isCurrentMember(_user), "Already a member");
+
         PendingRequest storage request = pendingRequests[_user];
 
         require(request.isPending, "Hasn't sent ether yet");
         _assign(_user, request.attributeIndexes);
+
+        //member.from = _from;
+        //member.to = _to;
+
+        allHolders.push(_user);
+        currentMemberCount += 1;
 
         emit ApprovedMembership(_user, request.attributeIndexes);
     }
 
     function discardRequest(address _user) external onlyOwner {
         PendingRequest storage request = pendingRequests[_user];
-
-        require(request.isPending, "Hasn't sent ether yet");
         request.isPending = false;
 
         delete request.attributeIndexes;
@@ -110,24 +115,23 @@ contract MembershipVerificationToken is Ownable, ERC165 {
         }
     }
 
-    // function modifyAttributeByIndex(address _to, uint _attributeIndex, uint _modifiedValueIndex) external onlyOwner {
-    //     // uint attributeIndex = getIndexOfAttribute(_attributeName);
-    //     //require(currentHolders[_to].data.length > _attributeIndex, "data doesn't exist for the user");
+    function modifyAttributeByIndex(address _to, uint _attributeIndex, uint _modifiedValueIndex) external onlyOwner {
+        require(currentHolders[_to].data.length > _attributeIndex, "data doesn't exist for the user");
         
-    //     uint prevIndex = currentHolders[_to].data[_attributeIndex];
-    //     bytes32 prevValue = attributeValueCollection[_attributeIndex][prevIndex];
-    //     currentHolders[_to].data[_attributeIndex] = _modifiedValueIndex;
-    //     bytes32 modifiedValue = attributeValueCollection[_attributeIndex][_modifiedValueIndex];
+        uint prevIndex = currentHolders[_to].data[_attributeIndex];
+        bytes32 prevValue = attributeValueCollection[_attributeIndex][prevIndex];
+        currentHolders[_to].data[_attributeIndex] = _modifiedValueIndex;
+        bytes32 modifiedValue = attributeValueCollection[_attributeIndex][_modifiedValueIndex];
         
-    //     emit ModifiedAttributes(
-    //         _to,
-    //         _attributeIndex,
-    //         prevIndex,
-    //         prevValue,
-    //         _modifiedValueIndex,
-    //         modifiedValue
-    //     );
-    // }
+        emit ModifiedAttributes(
+            _to,
+            _attributeIndex,
+            prevIndex,
+            prevValue,
+            _modifiedValueIndex,
+            modifiedValue
+        );
+    }
 
     function getAllMembers() external view returns (address[] memory) {
         return allHolders;
@@ -157,30 +161,22 @@ contract MembershipVerificationToken is Ownable, ERC165 {
 
     function isCurrentMember(address _who) public view returns (bool) {
         require(_who != address(0), "Zero address can't be a member");
-        return currentHolders[_who].hasToken;
+        return currentHolders[_who].to > now && now > currentHolders[_who].from;
     }
 
     function _assign(address _who, uint[] memory _attributeIndexes) internal {
         require(_who != address(0), "Can't assign to zero address");
         require(_attributeIndexes.length == attributeNames.length,"Need to input all attributes");
 
-        MemberData memory member;
-        member.hasToken = true;
-        currentHolders[_who] = member;
-
         for (uint index = 0; index < _attributeIndexes.length; index++) {
-
             currentHolders[_who].data.push(_attributeIndexes[index]);
         }
-
-        allHolders.push(_who);
-        currentMemberCount += 1;
     }
 
     function _revoke(address _from) internal {
         require(_from != address(0), "Can't revoke from zero address");
         MemberData storage member = currentHolders[_from];
-        member.hasToken = false;
+        member.to = now;
         currentMemberCount -= 1;
     }
 }
