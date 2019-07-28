@@ -54,13 +54,17 @@ contract MembershipVerificationToken is Ownable, ERC165 {
         _registerInterface(0x912f7bb2); //IERC1261
         _registerInterface(0x83adfb2d); //Ownable
 
-        
+        attributeNames.push("type");
     }
 
     modifier isCurrentHolder {
         require(isCurrentMember(msg.sender), "Not a current member");
         _;
     }
+
+    // function setMembershipType() public onlyOwner {
+
+    // }
 
     function requestMembership(uint[] calldata _attributeIndexes) external payable {
         require(!isCurrentMember(msg.sender), "Already a member");
@@ -195,6 +199,11 @@ contract MembershipVerificationToken is Ownable, ERC165 {
     }
 
     function _getEndDate(bytes32 _level) internal returns (uint256) {
-        return now + 1 years;
+        return now + 365 days;
+    }
+
+    function _getMembershipLevelForMember(address _who) internal view returns (bytes32) {
+        //6d656d626572736869706c6576656c
+        return currentHolders[_who].data[0];
     }
 }

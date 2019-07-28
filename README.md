@@ -1,5 +1,16 @@
 # Membership Token
-Blockchain Australia Membership Verification Token (MVT) ERC1261
+Blockchain Australia Membership Verification Token (MVT) ERC1261.  All contracts will be signed from 0xcF30649dD5016B4966C642f2B5BDC739a3E87eA7
+
+```json
+{
+  "address": "0xcf30649dd5016b4966c642f2b5bdc739a3e87ea7",
+  "msg": "Blockchain Australia Membership Verification Token (MVT) ERC1261.  All contracts will be signed from 0xcF30649dD5016B4966C642f2B5BDC739a3E87eA7",
+  "sig": "0xf2d1d3121c26285877380b8ede3bff7410ce3ae38283e9994581979d33260e4d7ee757bb38a524d5751882aa0977e921625ca254f219efcd868595c6728fa7211c",
+  "version": "3",
+  "signer": "MEW"
+}
+```
+
 
 ## How to use
 
@@ -31,6 +42,7 @@ You can also interface with the contract using the ABI file found in `/build/con
 ## Contract Address
 
 * Rinkeby `0x814970e830ff4abf1d03c22a72eeaab910abbdc5`
+* Main Net address
 
 ## Attributes
 
