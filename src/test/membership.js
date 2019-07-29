@@ -12,8 +12,8 @@ contract("MembershipVerificationToken", function(accounts) {
   });
 
   describe("MembershipVerificationToken tests", () => {
-    it("should add member level attibute set", async function () {
-      await contractInstance.addAttributeSet("0x4c6576656c", ["0x4c696665"]);
+    it("should add member type attibute set", async function () {
+      await contractInstance.addAttributeSet("0x74797065", ["0x4c696665"]);
     });
   });
 

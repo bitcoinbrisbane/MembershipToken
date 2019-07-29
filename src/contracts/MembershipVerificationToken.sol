@@ -24,11 +24,10 @@ contract MembershipVerificationToken is Ownable, ERC165 {
         uint256 duration;
     }
 
-    mapping (bytes32 => MembershipType) public membershipType;
-
-    mapping(uint => bytes32[]) public attributeValueCollection;
     bytes32[] public attributeNames;
 
+    mapping(bytes32 => MembershipType) public membershipTypes;
+    mapping(uint => bytes32[]) public attributeValueCollection;
     mapping(address => MemberData) public currentHolders;
     mapping(address => PendingRequest) public pendingRequests;
 
@@ -61,10 +60,6 @@ contract MembershipVerificationToken is Ownable, ERC165 {
         require(isCurrentMember(msg.sender), "Not a current member");
         _;
     }
-
-    // function setMembershipType() public onlyOwner {
-
-    // }
 
     function requestMembership(uint[] calldata _attributeIndexes) external payable {
         require(!isCurrentMember(msg.sender), "Already a member");
@@ -123,10 +118,22 @@ contract MembershipVerificationToken is Ownable, ERC165 {
         emit Revoked(_from);
     }
 
+    function addMembershipType(bytes32 _type, uint256 _fee, uint256 _duration) public onlyOwner {
+        
+    }
+
+    function modifyMembershipType(bytes32 _type, uint256 _fee, uint256 _duration) public onlyOwner {
+
+    }
+
+    function removeMembershipType(bytes32 _type) public onlyOwner {
+        delete membershipType[_type];
+    }
+
     function addAttributeSet(bytes32 _name, bytes32[] calldata values) external {
         attributeNames.push(_name);
         bytes32[] storage storedValues = attributeValueCollection[attributeNames.length - 1];
-        storedValues.push(0x756e646566696e65640000000000000000000000000000000000000000000000);
+        //storedValues.push(0x756e646566696e65640000000000000000000000000000000000000000000000);
 
         for (uint index = 0; index < values.length; index++) {
             storedValues.push(values[index]);
