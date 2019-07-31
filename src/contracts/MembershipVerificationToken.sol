@@ -25,8 +25,8 @@ contract MembershipVerificationToken is Ownable, ERC165 {
     }
 
     mapping (bytes32 => MembershipType) public membershipType;
-
     mapping(uint => bytes32[]) public attributeValueCollection;
+
     bytes32[] public attributeNames;
 
     mapping(address => MemberData) public currentHolders;
@@ -62,9 +62,9 @@ contract MembershipVerificationToken is Ownable, ERC165 {
         _;
     }
 
-    // function setMembershipType() public onlyOwner {
+    function addMembershipType(uint256 _fee, uint256 _duration) public onlyOwner {
 
-    // }
+    }
 
     function requestMembership(uint[] calldata _attributeIndexes) external payable {
         require(!isCurrentMember(msg.sender), "Already a member");
