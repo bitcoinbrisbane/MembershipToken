@@ -40,20 +40,15 @@ contract MembershipVerificationToken is Ownable, ERC165 {
     event Revoked(address indexed _to);
     event Forfeited(address indexed _to);
     
-    event ModifiedAttributes(
-        address indexed _to,
-        uint attributeIndex,
-        uint prevValueIndex,
-        bytes32 prevValue,
-        uint modifiedValueIndex,
-        bytes32 modifiedValue
-    );
+    event ModifiedAttributes(address indexed _to, uint attributeIndex, uint prevValueIndex, bytes32 prevValue, uint modifiedValueIndex, bytes32 modifiedValue);
 
     constructor() public {
         _registerInterface(0x912f7bb2); //IERC1261
         _registerInterface(0x83adfb2d); //Ownable
 
         attributeNames.push("type");
+        attributeValueCollection[0].push("life");
+        attributeValueCollection[0].push("board");
     }
 
     modifier isCurrentHolder {
@@ -61,15 +56,9 @@ contract MembershipVerificationToken is Ownable, ERC165 {
         _;
     }
 
-    function addMembershipType(uint256 _fee, uint256 _duration) public onlyOwner {
-
-    }
-
     function requestMembership(uint[] calldata _attributeIndexes) external payable {
         require(!isCurrentMember(msg.sender), "Already a member");
         require(_attributeIndexes.length == attributeNames.length, "Need to input all attributes");
-
-
 
         //Do some checks before assigning membership
         PendingRequest storage request = pendingRequests[msg.sender];
@@ -79,7 +68,7 @@ contract MembershipVerificationToken is Ownable, ERC165 {
         emit RequestedMembership(msg.sender);
     }
 
-    function forfeitMembership() external payable isCurrentHolder {
+    function forfeitMembership() external payable isCurrentHolder() {
         _revoke(msg.sender);
         emit Forfeited(msg.sender);
     }
@@ -112,26 +101,26 @@ contract MembershipVerificationToken is Ownable, ERC165 {
         delete request.attributeIndexes;
     }
 
-    function assignTo(address _to, uint[] calldata _attributeIndexes) external onlyOwner {
+    function assignTo(address _to, uint[] calldata _attributeIndexes) external onlyOwner() {
         _assign(_to, _attributeIndexes);
         emit Assigned(_to, _attributeIndexes);
     }
 
-    function revokeFrom(address _from) external onlyOwner {
+    function revokeFrom(address _from) external onlyOwner() {
         _revoke(_from);
         emit Revoked(_from);
     }
 
-    function addMembershipType(bytes32 _type, uint256 _fee, uint256 _duration) public onlyOwner {
+    function addMembershipType(uint256 _fee, uint256 _duration) public onlyOwner() {
         
     }
 
-    function modifyMembershipType(bytes32 _type, uint256 _fee, uint256 _duration) public onlyOwner {
+    function modifyMembershipType(bytes32 _type, uint256 _fee, uint256 _duration) public onlyOwner() {
 
     }
 
-    function removeMembershipType(bytes32 _type) public onlyOwner {
-        delete membershipType[_type];
+    function removeMembershipType(bytes32 _type) public onlyOwner() {
+        delete membershipTypes[_type];
     }
 
     function addAttributeSet(bytes32 _name, bytes32[] calldata values) external {
@@ -144,7 +133,7 @@ contract MembershipVerificationToken is Ownable, ERC165 {
         }
     }
 
-    function modifyAttributeByIndex(address _to, uint _attributeIndex, uint _modifiedValueIndex) external onlyOwner {
+    function modifyAttributeByIndex(address _to, uint _attributeIndex, uint _modifiedValueIndex) external onlyOwner() {
         require(currentHolders[_to].data.length > _attributeIndex, "data doesn't exist for the user");
         
         uint prevIndex = currentHolders[_to].data[_attributeIndex];
@@ -195,7 +184,7 @@ contract MembershipVerificationToken is Ownable, ERC165 {
 
     function _assign(address _who, uint[] memory _attributeIndexes) internal {
         require(_who != address(0), "Can't assign to zero address");
-        require(_attributeIndexes.length == attributeNames.length,"Need to input all attributes");
+        require(_attributeIndexes.length == attributeNames.length, "Need to input all attributes");
 
         for (uint index = 0; index < _attributeIndexes.length; index++) {
             currentHolders[_who].data.push(_attributeIndexes[index]);
@@ -213,8 +202,8 @@ contract MembershipVerificationToken is Ownable, ERC165 {
         return now + 365 days;
     }
 
-    function _getMembershipLevelForMember(address _who) internal view returns (bytes32) {
-        //6d656d626572736869706c6576656c
-        return currentHolders[_who].data[0];
-    }
+    // function _getMembershipLevelForMember(address _who) internal view returns (bytes32) {
+    //     //6d656d626572736869706c6576656c
+    //     return currentHolders[_who].data[0];
+    // }
 }
